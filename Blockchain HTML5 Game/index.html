@@ -1,0 +1,357 @@
+<html>
+
+  <head>
+      <title> Our Awsome Game </title>
+      <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.1/dist/phaser.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.36/dist/web3.min.js"></script>
+      <script src="eth.js"></script>
+
+
+  </head>
+  <body>
+
+    <h1>Game Website</h1>
+    <h2> Second Website Heading </h2>
+
+    <script>
+
+
+        var score = 0;
+        var cursors;
+        var knight;
+        var crates;
+        var background;
+        var coinTimer;
+        var scoreText; //displayed on screen
+        var secondsLeft = 60;
+        var timeLeftTimer;
+        var timeLeftText; //displayed on screen
+        var gameOver = false;
+        var coinsSent = false;
+
+
+
+        var config = {
+
+            width: 2000,
+            height: 800,
+            type: Phaser.AUTO,
+            scene: {
+
+
+              //essentially we are creating unity here
+              preload: gamePrelod,
+              create:gameCreate,
+              update:gameUpdate, //these keywords that come bnefore the functions must be buiult in loops probaly from phaser
+
+
+            },
+
+            physics:{
+              //we also will here configure our physics
+              default: "arcade",
+              arcade: {
+
+                  gravity: {y:400}, //we set the gravity to the y axis - positive instead of minus sop things go in thje correct way
+                  debug:false //iof true it will show all the collision borders - this will allow us to see how our objects collide - thats why its called debug
+
+
+              }
+
+
+
+            }
+        }
+
+
+    //loading assetts
+    function gamePrelod()
+    {
+        this.load.image("knight", "Assetts/knight.png"); //we set up the internal name in this parameter
+        this.load.image("crate", "Assetts/crate.png");
+        this.load.image("background", "Assetts/background.png");
+        this.load.image("coin", "Assetts/bitcoin.png")
+        console.log("Game Is Loading");
+
+        //animations
+
+        //run animation
+        this.load.image("run1", "Assetts/knight/run/Run (1).png");
+        this.load.image("run2", "Assetts/knight/run/Run (2).png");
+        this.load.image("run3", "Assetts/knight/run/Run (3).png");
+        this.load.image("run4", "Assetts/knight/run/Run (4).png");
+        this.load.image("run5", "Assetts/knight/run/Run (5).png");
+        this.load.image("run6", "Assetts/knight/run/Run (6).png");
+        this.load.image("run7", "Assetts/knight/run/Run (7).png");
+        this.load.image("run8", "Assetts/knight/run/Run (8).png");
+        this.load.image("run9", "Assetts/knight/run/Run (9).png");
+        this.load.image("run10", "Assetts/knight/run/Run (10).png");
+
+        //idle animation
+        this.load.image("idle1", "Assetts/knight/idle/Idle (1).png");
+        this.load.image("idle2", "Assetts/knight/idle/Idle (2).png");
+        this.load.image("idle3", "Assetts/knight/idle/Idle (3).png");
+        this.load.image("idle4", "Assetts/knight/idle/Idle (4).png");
+        this.load.image("idle5", "Assetts/knight/idle/Idle (5).png");
+        this.load.image("idle6", "Assetts/knight/idle/Idle (6).png");
+        this.load.image("idle7", "Assetts/knight/idle/Idle (7).png");
+        this.load.image("idle8", "Assetts/knight/idle/Idle (8).png");
+        this.load.image("idle9", "Assetts/knight/idle/Idle (9).png");
+        this.load.image("idle10", "Assetts/knight/idle/Idle (10).png");
+
+
+    }
+
+
+    //this will be a loop
+    function gameUpdate()
+    {
+        //console.log("Game Is Loading Assetts");
+
+        if(cursors.left.isDown)
+        {
+            knight.setVelocityX(-100);
+            knight.play("knightRun", true);
+            //flip the charecter on x axis when we go backwards or in left
+            knight.flipX = true;
+
+
+        }
+        else if (cursors.right.isDown)
+        {
+              knight.setVelocityX(100);
+              knight.play("knightRun", true);
+              knight.flipX = false;
+
+
+        }
+        else if(cursors.left.isUp || cursors.right.isUp)
+        {
+              knight.setVelocityX(0);
+              knight.play("knightIdle", true);
+        }
+
+
+        if(cursors.up.isDown && knight.body.touching.down)
+        {
+          knight.setVelocityY(-300);  //this will push the knight upward
+        }
+
+    }
+
+    //set up logic on the assetts
+    function  gameCreate()
+    {
+
+       //adding the background
+       this.add.image(400, 400,  "background");
+       this.add.image(1390, 400,  "background");
+
+
+
+
+       //drawing the knight - th following does not work with physics
+        //this.add.image(400,400, "knight")
+        knight = this.physics.add.sprite(100,100, "knight");
+        knight.body.setSize(400,600) //reset the collion box
+        knight.scaleX = 0.2; //change the scale by tempering with the knight var
+        knight.scaleY = knight.scaleX;
+
+
+        //floor
+        crates = this.physics.add.staticGroup();
+        crates.create(40,  700, "crate");
+        crates.create(120, 700, "crate");
+        crates.create(240, 700, "crate");
+        crates.create(320, 700, "crate");
+        crates.create(440, 700, "crate");
+        crates.create(520, 700, "crate");
+        crates.create(640, 700, "crate");
+        crates.create(720, 700, "crate");
+        crates.create(840, 600, "crate");
+        crates.create(915, 500, "crate");
+        crates.create(1040, 500, "crate");
+        crates.create(1120, 500, "crate");
+        crates.create(1220, 400, "crate");
+        crates.create(1300, 400, "crate");
+        crates.create(1400, 700, "crate");
+
+        crates.create(1520, 700, "crate");
+
+        //create animations
+
+        this.anims.create({
+
+          key: "knightRun",
+          frames: [ //this has to be frames
+            {key: "run1" },
+            {key: "run2" },
+            {key: "run3" },
+            {key: "run4" },
+            {key: "run5" },
+            {key: "run6" },
+            {key: "run7" },
+            {key: "run8" },
+            {key: "run9" },
+            {key: "run10" },
+          ],
+
+            frameRate: 10, //just use number of frames as framrate
+            repeat: 1, //here we automitically repeat the animation from 1
+
+        });
+
+
+
+        this.anims.create({
+
+          key: "knightIdle",
+          frames: [
+            {key: "idle1" },
+            {key: "idle2" },
+            {key: "idle3" },
+            {key: "idle4" },
+            {key: "idle5" },
+            {key: "idle6" },
+            {key: "idle7" },
+            {key: "idle8" },
+            {key: "idle9" },
+            {key: "idle10" },
+          ],
+
+            frameRate: 10, //just use number of frames as framrate
+            repeat: 1, //here we automitically repeat the animation from 1
+
+        });
+
+        //create collision
+        this.physics.add.collider(crates, knight);
+
+
+        //set up cursors
+
+        cursors = this.input.keyboard.createCursorKeys();
+
+        //timer
+
+        coinTimer = this.time.addEvent ({ //this is how you create a timer in phaser at some point experiement if this is phaser specific
+
+          //delay: 3000, //three seconds
+          delay: Phaser.Math.Between(3000, 7000),
+          callback: generateCoins,
+          callbackScope: this,
+          repeat: -1,
+
+
+        });
+
+        timeLeftTimer = this.time.addEvent ({
+
+           delay: 1000,
+           callback: updateTimeLeft,
+           callbackScope: this,
+           repeat: -1,
+
+
+        });
+
+        scoreText = this.add.text(50, 50, "Bitcoin Bag: 0 ", {fontSize:"32px", fill:"black",});
+
+        timeLeftText = this.add.text(50, 100, "Time Left: " + secondsLeft, {fontSize:"32px", fill:"black",});
+
+
+    }
+
+    function updateTimeLeft() {
+
+
+      //this is where we put our option to mint tokens
+        if(gameOver) {
+          //here we will send coins to the address of the user
+          if(!coinsSent){
+
+            var address = prompt("Please Enter Your Ethereum Address", "");
+            if(address == null || address == "")
+            {
+              alert("User Cancelled The Prompt")
+            }
+            else
+            {
+              //number of tokens we are minting
+              mintAfterGame(address, score)
+            }
+
+            coinsSent = true;
+
+          }
+          return; //this will allow us to stop the game and stop the counting
+
+
+        };
+
+        secondsLeft -= 1;
+        timeLeftText.setText("Time Left: " + secondsLeft); //we set the text for timer
+
+
+        console.log(secondsLeft);
+        if (secondsLeft <= 0){
+
+          this.physics.pause(); //this will probabably stop the physics
+          gameOver = true;
+
+        }
+
+    }
+
+    function generateCoins() {
+
+
+      console.log("generating coins");
+      var coins = this.physics.add.group({ //antyhting that shares all the smae propertieis should be imported as a group
+
+         key: "coin",
+         repeat: 5,
+         setXY: {
+
+            x: Phaser.Math.Between(0, 800),
+            y: -100, //we want them to appear above the screen
+            stepX: Phaser.Math.Between(30, 100), //adding some more randome to space out the coins - spacing out the individual coins
+
+         }
+
+      });
+
+      //we have to now access each of these coins or the children of this coins group and apply collider and physics properties to them
+      coins.children.iterate(function(child) {
+        //code we want to execute on eachcoin - each of these coins is given a bounce
+        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.5))
+
+
+      });
+
+      this.physics.add.collider(coins, crates);
+      this.physics.add.overlap(knight, coins, collectCoin, null, this );//this is essentially a collision event - thos things at the end are the two arguments the fucntion takes
+
+    }
+
+    function collectCoin(knight, coin){
+
+       coin.disableBody(true, true); //how to disable an object in javascript - the second true in the paremetrers is to make the object invis
+       score ++;
+       scoreText.setText("Bitcoin Bag: " + score);
+
+       console.log("the score is " + score);
+
+    }
+
+    //creating the game seems to be as easy as doing this - just creating this giant data set that holds our game - phaser does it all for you
+    var game = new Phaser.Game(config);
+
+    </script>
+
+
+
+
+
+  </body>
+</html>
